@@ -37,16 +37,14 @@ blockheight, since it only goes backwards in the blockchain.
 
     python anonymityset.py
     
-It will ask for the transaction ID and will then yield results on the fly, while also offering 
+It will ask for the transaction ID and the desired mixing depth. It will then yield results on the fly, while also offering 
 the option to save all collected data in a JSON formatted file 'transactionID.txt' afterwards.
 Please keep in mind a single parse, especially for PrivateSends with a high input count, will take some time.
 
 # Notes
 
-Currently this tool checks 8 rounds of mixing. Next versions will ask for desired mixing depth to check 
-or use the maximum mixing rounds at a given height.
-
-MongoDB is not the right database for this purpose, but it is pretty failsafe. Disadvantage: it's slow.
+MongoDB is not the right database for this purpose, but it is pretty failsafe. Disadvantage: it's slow (300 - 500 ops/second.
+PrivateSends may need millions of ops to be parsed).
 At a later stage I will release code for the Redis database, which is memory mapped and approximately 
 20 times faster (tests show converting bytecode into python dictionaries slows this down. 
 If you have a suggestion let me know).

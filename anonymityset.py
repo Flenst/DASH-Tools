@@ -34,9 +34,12 @@ def main():
     global denominations
 
     privatesendtxid = input('Which privateSend transactionID do you want to check?: ')
-    mixing_rounds = {1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [], 8: []}
-    denominations = {1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [], 8: []}
-    addresses = {1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [], 8: []}
+
+    desired_depth = int(input('How many mixing rounds to check?: '))
+    # build dictionaries to store parsing data
+    mixing_rounds = {i+1: [] for i in range(desired_depth)}
+    denominations = {i+1: [] for i in range(desired_depth)}
+    addresses = {i+1: [] for i in range(desired_depth)}
     anonymity_set = []
 
     # generate round 1 of mixing tx, while preventing duplicates
@@ -46,19 +49,19 @@ def main():
     print('Unique mixing transactions in round 1 :', (len(mixing_rounds[1])))
 
     # Fetch mixing rounds and denomination tx
-    for i in range(2, 9):
+    for i in range(2, desired_depth + 1):
         checktx(i)
 
     print('Fetching denomination inputs:')
     # Fetch denomination tx in last round
-    for txid in mixing_rounds[8]:
+    for txid in mixing_rounds[desired_depth]:
         for i in gettx(txid)[0]['vin']:
             localquery = gettx(i['txid'])
             if len(localquery[0]['vin']) != len(localquery[0]['vout']):
-                denominations[8].append(i['txid'])
+                denominations[desired_depth].append(i['txid'])
 
     for key, val in denominations.items():
-        print('Denomination transactions in round', key, ':', len(denominations[key]))
+        print('Denomination inputs in round', key, ':', len(denominations[key]))
 
     print('Fetching possible originating addresses:')
 
@@ -84,39 +87,18 @@ def main():
 
     for key, val in addresses.items():
         anonymity_set.extend(val)
-    print(len(anonymity_set))
     anonymity_set = set(anonymity_set)
 
-    print('Total anonymity set:', len(anonymity_set))
+    print('Total anonymity set (unique possible originating addresses):', len(anonymity_set))
 
+    # create optional export data dictionary, dump as JSON file as txid.txt
     export = input('Export JSON to file? [y/n]:')
     if export == 'yes' or export == 'y':
         data = {'transactionID': privatesendtxid,
                 'anonymitySet': len(anonymity_set),
-                'mixing_rounds': [{1: {'mixing_tx': mixing_rounds[1],
-                                       'denomination_tx': list(set(denominations[1])),
-                                       'addresses': addresses[1]}},
-                                  {2: {'mixing_tx': mixing_rounds[2],
-                                       'denomination_tx': list(set(denominations[2])),
-                                       'addresses': addresses[2]}},
-                                  {3: {'mixing_tx': mixing_rounds[3],
-                                       'denomination_tx': list(set(denominations[3])),
-                                       'addresses': addresses[3]}},
-                                  {4: {'mixing_tx': mixing_rounds[4],
-                                       'denomination_tx': list(set(denominations[4])),
-                                       'addresses': addresses[4]}},
-                                  {5: {'mixing_tx': mixing_rounds[5],
-                                       'denomination_tx': list(set(denominations[5])),
-                                       'addresses': addresses[5]}},
-                                  {6: {'mixing_tx': mixing_rounds[6],
-                                       'denomination_tx': list(set(denominations[6])),
-                                       'addresses': addresses[6]}},
-                                  {7: {'mixing_tx': mixing_rounds[7],
-                                       'denomination_tx': list(set(denominations[7])),
-                                       'addresses': addresses[7]}},
-                                  {8: {'mixing_tx': mixing_rounds[8],
-                                       'denomination_tx': list(set(denominations[8])),
-                                       'addresses': addresses[8]}}]}
+                'mixing_rounds': [{i + 1: {'mixing_tx': mixing_rounds[i+1],
+                                           'denomination_tx': list(set(denominations[i+1])),
+                                           'addresses': addresses[i+1]} for i in range(desired_depth)}]}
         with open('%s.txt' % privatesendtxid, 'w') as json_file:
             json.dump(data, json_file)
 
