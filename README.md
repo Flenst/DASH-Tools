@@ -1,16 +1,17 @@
 # DASH-Tools
- different tools for blockchain parsing and analyzing privateSend
+Different tools for blockchain parsing and analyzing PrivateSend.
 
-Prerequisites
+# Prerequisites
 
-- python 3 with pymongo, requests, json
+- Python3 with pymongo, requests, json
 - MongoDB Server https://www.mongodb.com/download-center/community
-- recommended: https://www.mongodb.com/download-center/compass (GUI to access DB)
+- Recommended: https://www.mongodb.com/download-center/compass (GUI to access DB)
     
-Build the database
+# Build the database
 
-start the DASH daemon with the -rest argument, since we use the RESTful API to fetch blocks.
+Start the DASH daemon with the -rest argument, since we use the RESTful API to fetch blocks.
 On Windows for ease of use create a startdaemon.bat in the dashcore-x.xx.x/bin folder:
+You can also replace dashd with dash-qt in order to launch the GUI at the same time.
 
     dashd.exe -printtoconsole=1 -rest -disablewallet=1
     
@@ -27,18 +28,18 @@ The tool will check your last inserted block and start at its height with full s
 
 # Important
 
-create a txid index in MongoDB, since we will use txids for all further DB queries. Use MongoDB 
+Create a txid index in MongoDB, since we will use txids for all further DB queries. Use MongoDB 
 compass, navigate to the 'blocks' collection, then 'Indexes' and then 'CREATE INDEX'.
 Choose txid as name, and choose tx.txid as field.
 
-When you are at a reasonable blockheight you can start to parse privateSends with the appropriate
+When you are at a reasonable blockheight you can start to parse PrivateSends with the appropriate
 blockheight, since it only goes backwards in the blockchain.
 
     python anonymityset.py
     
-It asks for the transaction ID and will then yield results on the fly, while also offering 
+It will ask for the transaction ID and will then yield results on the fly, while also offering 
 the option to save all collected data in a JSON formatted file 'transactionID.txt' afterwards.
-Please keep in mind a single parse, especially for privateSends with a high input count, will take some time.
+Please keep in mind a single parse, especially for PrivateSends with a high input count, will take some time.
 
 # Notes
 
