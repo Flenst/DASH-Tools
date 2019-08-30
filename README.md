@@ -26,7 +26,7 @@ Building the database takes some time. You will notice it slows down. I was not 
 so when it gets too slow stop the process with 'Ctrl + C', restart your machine and start again.
 The tool will check your last inserted block and start at its height with full speed again.
 
-# Important
+# Important(MongoDB)
 
 Create a txid index in MongoDB, since we will use txids for all further DB queries. Use MongoDB 
 compass, navigate to the 'blocks' collection, then 'Indexes' and then 'CREATE INDEX'.
@@ -40,6 +40,25 @@ blockheight, since it only goes backwards in the blockchain.
 It will ask for the transaction ID and the desired mixing depth. It will then yield results on the fly, while also offering 
 the option to save all collected data in a JSON formatted file 'transactionID.txt' afterwards.
 Please keep in mind a single parse, especially for PrivateSends with a high input count, will take some time.
+
+# Redis database
+
+On Windows use https://github.com/dmajkic/redis/downloads
+
+Current size at block ~1120000 is 18,08GB, so at least 32GB RAM is recommended. Set "maxmemory = 32000mb"
+in the appropriate conf file.
+
+A GUI for Redis is https://fastoredis.com/
+
+When the DASH daemon is synced execute restfulparseRedis.py with:
+
+    python restfulparseRedis.py
+    
+When the db is built you can use anonymitysetRedis.py to do check privateSend transaction IDs
+for its anonymity set, participating addresses per round etc. and optional dump data into a JSON textfile.
+
+REMEMBER: this is even more experimental and breaks easily.
+
 
 # Notes
 
